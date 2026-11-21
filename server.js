@@ -26,8 +26,25 @@ function decode(s){return s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g,'$1').replace(
 function tag(s,n){return (s.match(new RegExp(`<${n}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${n}>`,'i'))||[])[1]||''}
 function parse(xml,source){const items=[...xml.matchAll(/<item(?:\s[^>]*)?>([\s\S]*?)<\/item>/gi)].map(m=>m[1]);return items.slice(0,35).map(it=>({title:decode(tag(it,'title')),url:decode(tag(it,'link')),date:tag(it,'pubDate'),source:source.name,category:source.category})).filter(x=>x.title&&/^https?:\/\//.test(x.url)&&(source.name!=='Business Record'||realEstateTerms.test(x.title)))}
 let cache={time:0,items:[],statuses:[]};
+let lesCache={time:0,data:null};
+async function lesLatest(){
+ if(lesCache.data&&Date.now()-lesCache.time<60*60*1000)return lesCache.data;
+ const archive='https://desmoinesmarketvalues.com/2026-youtube-videos';
+ const fallback={title:'SimplyDesMoines Market Values',videoUrl:null,archive,updated:false};
+ try{
+  const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),6500);
+  let html;
+  try{const response=await fetch(archive,{signal:ctrl.signal,headers:{'User-Agent':'Mozilla/5.0 (compatible; CentralIowaRealEstateHub/1.0)'}});if(!response.ok)throw Error('Archive unavailable');html=await response.text()}finally{clearTimeout(timer)}
+  // The official archive displays its most recent episode first. Match the first embedded YouTube player.
+  const embed=html.match(/(?:youtube(?:-nocookie)?\\.com\\/embed\\/|youtube\\.com\\/watch\\?v=|youtu\\.be\\/)([A-Za-z0-9_-]{11})/i);
+  const heading=html.match(/Week\\s*\\d+\\s*,?\\s*2026\\s*[-–:]\\s*([^<\\r\\n]{8,180})/i);
+  const data={...fallback,title:heading?heading[0].replace(/&amp;/g,'&').trim():fallback.title,videoUrl:embed?'https://www.youtube-nocookie.com/embed/'+embed[1]:null,updated:!!embed};
+  lesCache={time:Date.now(),data};return data;
+ }catch{lesCache={time:Date.now(),data:fallback};return fallback}
+}
+
 async function news(){if(Date.now()-cache.time<20*60*1000)return cache;const results=await Promise.all(sources.map(async s=>{try{const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),7000);try{const r=await fetch(s.url,{headers:{'User-Agent':'CentralIowaRealEstateHub/0.1 (personal learning aggregator)','Accept':'application/rss+xml, application/xml, text/xml'},signal:ctrl.signal});if(!r.ok)throw Error('HTTP '+r.status);const items=parse(await r.text(),s);return {items,status:{source:s.name,ok:items.length>0,count:items.length}}}finally{clearTimeout(timer)}}catch(e){return {items:[],status:{source:s.name,ok:false,error:'Feed unavailable'}}}}));const items=results.flatMap(x=>x.items);
 const priority=x=>x.source.includes('DMAAR')?0:x.source.includes('Iowa REALTORS')?1:x.source.includes('Central Iowa Housing')?2:x.source.includes('Iowa Development')?3:x.source==='Business Record'?4:5;
 if(items.length||!cache.items.length)cache={time:Date.now(),items:items.sort((a,b)=>priority(a)-priority(b)||new Date(b.date)-new Date(a.date)).slice(0,80),statuses:results.map(x=>x.status)};else cache={...cache,time:Date.now(),statuses:results.map(x=>x.status)};return cache}
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.png':'image/png'};
-http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://localhost');if(u.pathname==='/api/news'){const data=await news();res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'public, max-age=300'});return res.end(JSON.stringify({...data,links}))}let p=u.pathname==='/'?'/index.html':u.pathname;if(!['/index.html','/app.js','/styles.css','/manifest.webmanifest','/icon.svg','/erin-kamp-logo.jpg','/rainbow-real-estate-icon.png'].includes(p)){res.writeHead(404);return res.end('Not found')}const body=await fs.readFile(path.join(process.cwd(),p));res.writeHead(200,{'Content-Type':mime[path.extname(p)]||'application/json'});res.end(body)}catch(e){res.writeHead(500);res.end('Server error')}}).listen(PORT,()=>console.log(`Hub running at http://localhost:${PORT}`));
+http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://localhost');if(u.pathname==='/api/les'){const data=await lesLatest();res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'public, max-age=900'});return res.end(JSON.stringify(data))}if(u.pathname==='/api/news'){const data=await news();res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'public, max-age=300'});return res.end(JSON.stringify({...data,links}))}let p=u.pathname==='/'?'/index.html':u.pathname;if(!['/index.html','/app.js','/styles.css','/manifest.webmanifest','/icon.svg','/erin-kamp-logo.jpg','/rainbow-real-estate-icon.png'].includes(p)){res.writeHead(404);return res.end('Not found')}const body=await fs.readFile(path.join(process.cwd(),p));res.writeHead(200,{'Content-Type':mime[path.extname(p)]||'application/json'});res.end(body)}catch(e){res.writeHead(500);res.end('Server error')}}).listen(PORT,()=>console.log(`Hub running at http://localhost:${PORT}`));
