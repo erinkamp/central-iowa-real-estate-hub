@@ -22,3 +22,26 @@ header::before{content:"";display:block;height:5px;background:var(--rainbow)}
 footer{border-top:5px solid transparent;border-image:var(--rainbow) 1}
 .footer-logo{background:white}
 @media(prefers-reduced-motion:reduce){.article,.source{transition:none}}
+
+/* Brighter rainbow accents, while keeping news cards readable. */
+header::before{height:8px;background:linear-gradient(90deg,#ed6471,#f39b55,#f1c85a,#64b98c,#60a9db,#9275ce)}
+.mark{width:49px;height:49px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(180deg,#ee6570 0%,#f29b56 20%,#f3cb5e 39%,#6fbe8b 57%,#65a8df 76%,#9c75d1 100%);box-shadow:0 3px 12px #8b7bba33}
+.mark img{width:36px;height:36px;display:block;filter:drop-shadow(0 1px 1px #36435430)}
+.hero{background:radial-gradient(ellipse at 90% 22%,#dff3e9 0%,transparent 49%),radial-gradient(ellipse at 5% 92%,#fbe3ed 0%,transparent 40%),radial-gradient(ellipse at 67% 95%,#ece4fb 0%,transparent 38%)}
+.hero::after{width:172px;height:7px;background:linear-gradient(90deg,#ed6471,#f39b55,#f1c85a,#64b98c,#60a9db,#9275ce)}
+.eyebrow{color:#7d62a8}
+.hero h1 em{background:linear-gradient(90deg,#237e79,#6477c2,#a16eb5);-webkit-background-clip:text;background-clip:text;color:transparent}
+.primary{background:linear-gradient(105deg,#176c71,#456db5,#8662b4);color:white}
+.chip{background:#f5e9fa;color:#714f91}
+.tabs{border-bottom:3px solid transparent;border-image:linear-gradient(90deg,#f0a0a5,#f4d48b,#8dcfa8,#83bce6,#bba1df) 1}
+.filters button[data-filter="All"]:not(.active){border-bottom:3px solid #d77e99}
+.filters button.active{background:linear-gradient(105deg,#1c7779,#7657a8);border-color:transparent}
+.article:nth-child(6n+1)::before{background:#e88a98}
+.article:nth-child(6n+2)::before{background:#f0b46d}
+.article:nth-child(6n+3)::before{background:#d5c36a}
+.article:nth-child(6n+4)::before{background:#76bd9b}
+.article:nth-child(6n+5)::before{background:#7caee0}
+.article:nth-child(6n+6)::before{background:#ac8bd1}
+.study{background:linear-gradient(110deg,#f8eaf0,#f6f3dc 38%,#e9f6ee 68%,#eeeafa)}
+.source .go{color:#7657a8}
+footer{border-top:7px solid transparent;border-image:linear-gradient(90deg,#ed6471,#f39b55,#f1c85a,#64b98c,#60a9db,#9275ce) 1}
