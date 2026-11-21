@@ -1,0 +1,25 @@
+import http from 'node:http';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+const PORT=process.env.PORT||3000;
+const sources=[
+ {name:'Business Record',url:'https://www.businessrecord.com/feed/',home:'https://www.businessrecord.com/',category:'Development'},
+ {name:'Google News · Central Iowa Housing',url:'https://news.google.com/rss/search?q=Des+Moines+Iowa+housing+market+real+estate&hl=en-US&gl=US&ceid=US:en',home:'https://news.google.com/search?q=Des%20Moines%20Iowa%20housing%20market',category:'Local News'},
+ {name:'Google News · Iowa Development',url:'https://news.google.com/rss/search?q=West+Des+Moines+Waukee+Clive+Iowa+development+construction&hl=en-US&gl=US&ceid=US:en',home:'https://news.google.com/search?q=West%20Des%20Moines%20development',category:'Development'},
+ {name:'Google News · Mortgage',url:'https://news.google.com/rss/search?q=mortgage+rates+housing+finance+Iowa&hl=en-US&gl=US&ceid=US:en',home:'https://news.google.com/search?q=mortgage%20rates%20Iowa',category:'Financing'}
+];
+const links=[
+ {name:'DMAAR Housing Statistics',url:'https://www.dmaar.com/news/housing-stats',category:'Market Data',frequency:'Monthly'},
+ {name:'Iowa REALTORS Housing Statistics',url:'https://iowarealtors.com/housing-stats',category:'Market Data',frequency:'Monthly'},
+ {name:'Freddie Mac PMMS',url:'https://www.freddiemac.com/pmms',category:'Financing',frequency:'Weekly'},
+ {name:'Iowa Finance Authority',url:'https://www.iowafinance.com/',category:'Financing',frequency:'As published'},
+ {name:'National Association of REALTORS',url:'https://www.nar.realtor/',category:'Professional',frequency:'As published'},
+ {name:'Business Record',url:'https://www.businessrecord.com/',category:'Development',frequency:'Daily'}
+];
+function decode(s){return s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g,'$1').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/<[^>]+>/g,'').trim()}
+function tag(s,n){return (s.match(new RegExp(`<${n}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${n}>`,'i'))||[])[1]||''}
+function parse(xml,source){const items=[...xml.matchAll(/<item(?:\s[^>]*)?>([\s\S]*?)<\/item>/gi)].map(m=>m[1]);return items.slice(0,18).map(it=>({title:decode(tag(it,'title')),url:decode(tag(it,'link')),date:tag(it,'pubDate'),source:source.name,category:source.category})).filter(x=>x.title&&/^https?:\/\//.test(x.url))}
+let cache={time:0,items:[],statuses:[]};
+async function news(){if(Date.now()-cache.time<20*60*1000)return cache;const results=await Promise.all(sources.map(async s=>{try{const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),7000);try{const r=await fetch(s.url,{headers:{'User-Agent':'CentralIowaRealEstateHub/0.1 (personal learning aggregator)','Accept':'application/rss+xml, application/xml, text/xml'},signal:ctrl.signal});if(!r.ok)throw Error('HTTP '+r.status);const items=parse(await r.text(),s);return {items,status:{source:s.name,ok:items.length>0,count:items.length}}}finally{clearTimeout(timer)}}catch(e){return {items:[],status:{source:s.name,ok:false,error:'Feed unavailable'}}}}));const items=results.flatMap(x=>x.items);if(items.length||!cache.items.length)cache={time:Date.now(),items:items.sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,80),statuses:results.map(x=>x.status)};else cache={...cache,time:Date.now(),statuses:results.map(x=>x.status)};return cache}
+const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml'};
+http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://localhost');if(u.pathname==='/api/news'){const data=await news();res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'public, max-age=300'});return res.end(JSON.stringify({...data,links}))}let p=u.pathname==='/'?'/index.html':u.pathname;if(!['/index.html','/app.js','/styles.css','/manifest.webmanifest','/icon.svg'].includes(p)){res.writeHead(404);return res.end('Not found')}const body=await fs.readFile(path.join(process.cwd(),p));res.writeHead(200,{'Content-Type':mime[path.extname(p)]||'application/json'});res.end(body)}catch(e){res.writeHead(500);res.end('Server error')}}).listen(PORT,()=>console.log(`Hub running at http://localhost:${PORT}`));
