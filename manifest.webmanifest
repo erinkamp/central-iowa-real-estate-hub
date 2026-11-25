@@ -1,1 +1,1 @@
-{"name":"Central Iowa Real Estate Hub","short_name":"Iowa RE Hub","start_url":"/","display":"standalone","background_color":"#fbfcf9","theme_color":"#163e42","icons":[{"src":"/rainbow-real-estate-icon.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}
+{"name":"Central Iowa Real Estate Morning Brief","short_name":"Iowa RE Hub","start_url":"./","display":"standalone","background_color":"#fbfcf9","theme_color":"#163e42","icons":[{"src":"./rainbow-real-estate-icon.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}
