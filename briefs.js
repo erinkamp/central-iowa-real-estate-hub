@@ -1,5 +1,59 @@
 window.BRIEFS = [
   {
+    "date": "2026-11-27",
+    "summary": "Post-Thanksgiving briefing: a recent metro commercial permit review, Iowa financing indicators and a practical look at deferred down payment assistance. No new DMAAR release was located.",
+    "sections": [
+      {
+        "title": "Local housing — DMAAR watch",
+        "body": "The latest DMAAR report located remains the October report published November 16. No new release was found this morning. Do not interpret holiday-week listing activity as a new monthly trend. For buyers in Clive, West Des Moines and Waukee, compare current competing properties within the same price band and construction type; for sellers, check recent pending activity before adjusting price.",
+        "links": [
+          [
+            "DMAAR — November 16, 2026",
+            "https://www.dmaar.com/news/blog/"
+          ]
+        ]
+      },
+      {
+        "title": "Metro development — commercial permit pipeline",
+        "body": "A November 25 Business Record review counted 48 permits for new commercial projects across Greater Des Moines during August through October. Its accompanying map and spreadsheet also cover improvements to existing buildings. This is a commercial development indicator, not a residential inventory count or a measure of completed projects. Use the map to identify projects near client search areas, then confirm project status with the relevant municipality before describing future amenities.",
+        "links": [
+          [
+            "Business Record — November 25, 2026",
+            "https://www.businessrecord.com/building-permits-learn-what-is-being-built-in-des-moines-area/"
+          ]
+        ]
+      },
+      {
+        "title": "Financing — Iowa versus national",
+        "body": "Zillow's Iowa rate table lists 7.44% for a 30-year fixed mortgage on November 26. Freddie Mac's November 25 national survey reported 7.21%, down from 7.28% the preceding week. These are different data sources and borrower populations, so the difference does not establish an Iowa borrowing premium. Obtain actual lender quotes with matching points, loan type, credit profile and lock period. Sellers should avoid advertising a payment based solely on a national average.",
+        "links": [
+          [
+            "Zillow Iowa — November 26 observation",
+            "https://www.zillow.com/homeloans/mortgage-rates/iowa/"
+          ],
+          [
+            "Freddie Mac release — November 25, 2026",
+            "https://www.globenewswire.com/news-release/2026/11/25/3410486/0/en/mortgage-rates-dip-to-7-21.html"
+          ]
+        ]
+      },
+      {
+        "title": "Buyer assistance and regulatory watch",
+        "body": "Iowa's official assistance page describes changes effective November 2, announced September 17. This is an existing program update, not new legislation today. Homes for Iowans offers a second loan of up to 5% of the lower of sale price or appraised value, with repayment due on sale, refinance or payoff of the first mortgage; no monthly payment is required. Confirm current eligibility and funding with a participating lender. No new Iowa real estate regulatory change was verified in today's search.",
+        "links": [
+          [
+            "Iowa Finance Authority — September 17 notice, effective November 2, 2026",
+            "https://opportunityiowa.gov/housing/homeownership-programs/down-payment-and-closing-costs-programs"
+          ]
+        ]
+      }
+    ],
+    "lesson": {
+      "title": "Model deferred assistance at resale",
+      "body": "Assume a $300,000 purchase and appraisal with a hypothetical 5% Homes for Iowans second loan of $15,000. At a later hypothetical sale for $330,000 with a first mortgage payoff of $270,000, subtract both loan balances: $45,000 remains before selling costs, taxes and other adjustments, rather than $60,000. Ask a participating lender to confirm repayment terms and compare this with an unassisted loan. Practice explaining the distinction between upfront cash relief and a grant."
+    }
+  },
+  {
     "date": "2026-11-26",
     "summary": "Thanksgiving edition: downtown Des Moines investment continues despite municipal budget pressures; national mortgage APRs are steady this morning. No new DMAAR release was located.",
     "sections": [
